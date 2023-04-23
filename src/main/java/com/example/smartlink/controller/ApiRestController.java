@@ -1,41 +1,53 @@
 package com.example.smartlink.controller;
 
-import com.example.smartlink.consumer.SmartLinkConsumer;
-import com.example.smartlink.dto.SmartLinkDTO;
-import lombok.RequiredArgsConstructor;
+import com.example.smartlink.configuration.RabbitConfiguration;
+import com.example.smartlink.dto.SmartLink;
+import com.example.smartlink.dto.UserSl;
+import com.example.smartlink.service.DtoService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
-@RequestMapping(value = "/smartLinkListApi")
-@RequiredArgsConstructor
+@RestController
+@RequestMapping( "/api")
 public class ApiRestController {
+    private final RabbitTemplate rabbitTemplate;
+
     @Autowired
-    private KafkaTemplate<String, SmartLinkDTO> kafkaTemplate;
-    private SmartLinkConsumer smartLinkConsumer;
+    private DtoService dtoService;
 
-    @PostMapping("/add")
-    public void addSmartLink(@RequestBody SmartLinkDTO smartLinkDTO) {
-        kafkaTemplate.send("smartLink", smartLinkDTO);
+    public ApiRestController(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
     }
 
-    @GetMapping("/smartLinkListApi/{userId}")
-    public List<SmartLinkDTO> getSmartLinkList(@PathVariable Long userId) {
-        return smartLinkConsumer.findSmartLInkListByUserId(userId);
+    @PostMapping("/addLink")
+    public ResponseEntity<String> addSmartLink(@RequestBody SmartLink smartLink) {
+        rabbitTemplate.convertAndSend("", RabbitConfiguration.QUEUE_SMARTLINK, smartLink);
+        return ResponseEntity.ok("Smart link sent to the consumer");
     }
 
-    @DeleteMapping("/smartLinkListApi/{userId}/{smartLinkId}")
-    public void deleteSmartLink(@PathVariable Long userId, @PathVariable Long smartLinkId) {
-        smartLinkConsumer.deleteSmartLink(userId, smartLinkId);
+    @PostMapping("/addUser")
+    public ResponseEntity<String> addUSer(@RequestBody UserSl user) {
+        rabbitTemplate.convertAndSend("", RabbitConfiguration.QUEUE_USER, user);
+        return ResponseEntity.ok("Smart link sent to the consumer");
     }
 
-    @PutMapping("/smartLinkListApi/{userId}/{smartLinkId}")
-    public void updateSmartLinkList(@RequestBody SmartLinkDTO smartLinkDTO,
-                                     @PathVariable Long userId, @PathVariable Long smartLinkId) {
-        smartLinkConsumer.updateSmartLink(smartLinkDTO, userId, smartLinkId);
+    @GetMapping
+    public List<SmartLink> getSmartLinkList() {
+        return dtoService.findSmartLinkList();
+    }
+
+    @DeleteMapping
+    public void deleteSmartLink(SmartLink smartLink) {
+        dtoService.deleteSmartLink(smartLink);
+    }
+
+    @PutMapping
+    public ResponseEntity<String> updateSmartLinkList(@RequestBody SmartLink smartLink) {
+        rabbitTemplate.convertAndSend("", RabbitConfiguration.QUEUE_SMARTLINK, smartLink);
+        return ResponseEntity.ok("Smart link sent to the consumer");
     }
 }
