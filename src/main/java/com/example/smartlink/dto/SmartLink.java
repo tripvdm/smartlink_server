@@ -1,31 +1,32 @@
 package com.example.smartlink.dto;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class SmartLink implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue
+    @UuidGenerator
+    private UUID id;
     private String photo;
     private String title;
     private String url;
     private String price;
     private String phoneNumber;
-    @ManyToOne
-    @JoinColumn(name="usersl_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="usersl_id")
     private UserSl userSl;
-
     public SmartLink() {}
 
-    public long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -75,18 +76,5 @@ public class SmartLink implements Serializable {
 
     public void setUserSl(UserSl userSl) {
         this.userSl = userSl;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SmartLink smartLink = (SmartLink) o;
-        return url.equals(smartLink.url);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(url);
     }
 }

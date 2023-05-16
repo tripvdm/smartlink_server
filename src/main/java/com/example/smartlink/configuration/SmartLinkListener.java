@@ -7,6 +7,7 @@ import com.example.smartlink.repository.UserRepository;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SmartLinkListener {
@@ -17,12 +18,16 @@ public class SmartLinkListener {
     private UserRepository userRepository;
 
     @RabbitListener(queues = {RabbitConfiguration.QUEUE_SMARTLINK})
-    public void onSmartLink(SmartLink smartLink) {
+    @Transactional
+    public void onSmartLinkListener(SmartLink smartLink) {
+        UserSl userSl = smartLink.getUserSl();
+        userSl = userRepository.findByEmail(userSl.getEmail());
+        smartLink.setUserSl(userSl);
         smartLinkRepository.save(smartLink);
     }
 
     @RabbitListener(queues = {RabbitConfiguration.QUEUE_USER})
-    public void onSmartLink(UserSl userSl) {
+    public void onSmartLinkListener(UserSl userSl) {
         userRepository.save(userSl);
     }
 }

@@ -30,14 +30,14 @@ public class ApiRestController {
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity<String> addUSer(@RequestBody UserSl user) {
+    public ResponseEntity<String> addUser(@RequestBody UserSl user) {
         rabbitTemplate.convertAndSend("", RabbitConfiguration.QUEUE_USER, user);
         return ResponseEntity.ok("Smart link sent to the consumer");
     }
 
-    @GetMapping
-    public List<SmartLink> getSmartLinkList() {
-        return dtoService.findSmartLinkList();
+    @GetMapping("/{email}")
+    public List<SmartLink> getSmartLinkListByEmail(@PathVariable String email) {
+        return dtoService.findSmartLinkList(email);
     }
 
     @DeleteMapping

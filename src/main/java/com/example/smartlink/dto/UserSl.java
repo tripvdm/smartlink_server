@@ -2,28 +2,32 @@ package com.example.smartlink.dto;
 
 import jakarta.persistence.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Entity
-public class UserSl {
+@Table(name = "UserSl")
+public class UserSl implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     private String login;
+    @Column(unique = true)
     private String email;
 
-    @OneToMany
-    @JoinColumn(name = "usersl_id")
-    private Set<SmartLink> smartLinks = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<SmartLink> smartLinks = new ArrayList<>();
 
     public UserSl() { }
 
-    public long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -43,11 +47,24 @@ public class UserSl {
         this.email = email;
     }
 
-    public Set<SmartLink> getSmartLinks() {
+    public List<SmartLink> getSmartLinks() {
         return smartLinks;
     }
 
-    public void setSmartLinks(Set<SmartLink> smartLinkSet) {
+    public void setSmartLinks(List<SmartLink> smartLinkSet) {
         this.smartLinks = smartLinkSet;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserSl userSl = (UserSl) o;
+        return Objects.equals(id, userSl.id) && Objects.equals(login, userSl.login) && Objects.equals(email, userSl.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, login, email);
     }
 }

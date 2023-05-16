@@ -21,12 +21,15 @@ spring:
   rabbitmq:
     host: localhost
     port: 5672
-    username: lipakov
-    password: thaimassage
+    username: guest
+    password: guest
+    listener:
+      simple:
+        default-requeue-rejected: false
   datasource:
-    url: jdbc:postgresql://localhost:5433/smartlink
-    username: lipakov
-    password: room1234
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: postgres
+    password: china_town
     driverClassName: org.postgresql.Driver
     h2:
       console:
