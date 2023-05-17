@@ -27,7 +27,11 @@ public class SmartLinkListener {
     }
 
     @RabbitListener(queues = {RabbitConfiguration.QUEUE_USER})
+    @Transactional
     public void onSmartLinkListener(UserSl userSl) {
-        userRepository.save(userSl);
+        UserSl sameUserSl = userRepository.findByEmail(userSl.getEmail());
+        if (sameUserSl == null) {
+            userRepository.save(userSl);
+        }
     }
 }

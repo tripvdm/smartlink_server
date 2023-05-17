@@ -2,6 +2,7 @@ package com.example.smartlink.dto;
 
 import jakarta.persistence.*;
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
