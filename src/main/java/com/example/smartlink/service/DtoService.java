@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -22,10 +23,16 @@ public class DtoService {
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public List<SmartLink> findSmartLinkList(String email) {
         UserSl userSl = userRepository.findByEmail(email);
-        return smartLinkRepository.findByUserSlId(userSl.getId());
+        List<SmartLink> smartLinkList = smartLinkRepository.findByUserSlId(userSl.getId());
+        Collections.reverse(smartLinkList);
+        return smartLinkList;
     }
 
     public void deleteSmartLink(SmartLink smartLink) {
         smartLinkRepository.delete(smartLink);
+    }
+
+    public void deleteSmartLinkList() {
+        smartLinkRepository.deleteAll();
     }
 }

@@ -40,9 +40,14 @@ public class ApiRestController {
         return dtoService.findSmartLinkList(email);
     }
 
-    @DeleteMapping
-    public void deleteSmartLink(SmartLink smartLink) {
+    @DeleteMapping("/{id}")
+    public void deleteSmartLink(@RequestBody SmartLink smartLink) {
         dtoService.deleteSmartLink(smartLink);
+    }
+
+    @DeleteMapping("/")
+    public void deleteSmartLinkList() {
+        dtoService.deleteSmartLinkList();
     }
 
     @PutMapping
